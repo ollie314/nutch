@@ -65,6 +65,7 @@
      <ant dir="parse-swf" target="deploy"/>
      <ant dir="parse-tika" target="deploy"/>
      <ant dir="parse-zip" target="deploy"/>
+     <ant dir="publish-rabbitmq" target="deploy"/>
      <ant dir="scoring-depth" target="deploy"/>
      <ant dir="scoring-opic" target="deploy"/>
      <ant dir="scoring-link" target="deploy"/>
@@ -106,6 +107,7 @@
      <ant dir="index-replace" target="test"/>
      <ant dir="index-links" target="test"/>
      <ant dir="mimetype-filter" target="test"/>
+     <ant dir="indexer-elastic" target="test"/>
      <ant dir="language-identifier" target="test"/>
      <ant dir="lib-http" target="test"/>
      <ant dir="protocol-file" target="test"/>

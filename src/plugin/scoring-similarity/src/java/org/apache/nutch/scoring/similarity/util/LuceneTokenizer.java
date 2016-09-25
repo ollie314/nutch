@@ -19,6 +19,7 @@ package org.apache.nutch.scoring.similarity.util;
 import java.io.StringReader;
 import java.util.List;
 
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -94,12 +95,13 @@ public class LuceneTokenizer {
    * @param content - The text to tokenize
    * @param tokenizer - the type of tokenizer to use CLASSIC or DEFAULT 
    * @param stemFilterType - Type of stemming to perform
-   * @param ngram - Value of ngram for tokenizing
+   * @param mingram - Value of mingram for tokenizing
+   * @param maxgram - Value of maxgram for tokenizing
    */
-  public LuceneTokenizer(String content, TokenizerType tokenizer, StemFilterType stemFilterType, int ngram) {
+  public LuceneTokenizer(String content, TokenizerType tokenizer, StemFilterType stemFilterType, int mingram, int maxgram) {
     this.tokenizer = tokenizer;
     this.stemFilterType = stemFilterType;
-    tokenStream = createNGramTokenStream(content,ngram);
+    tokenStream = createNGramTokenStream(content, mingram, maxgram);
   }
   
   private TokenStream createTokenStream(String content) {
@@ -112,23 +114,31 @@ public class LuceneTokenizer {
     return tokenStream;
   }
 
-  private TokenStream generateTokenStreamFromText(String content, TokenizerType tokenizer){
-    switch(tokenizer){
+  private TokenStream generateTokenStreamFromText(String content, TokenizerType tokenizerType){
+    Tokenizer tokenizer = null;
+    switch(tokenizerType){
     case CLASSIC:
-      tokenStream = new ClassicTokenizer(new StringReader(content));
+      tokenizer = new ClassicTokenizer();
       break;
 
     case STANDARD:
-      tokenStream = new StandardTokenizer(new StringReader(content));
+    default:
+      tokenizer = new StandardTokenizer();
     }
+
+    tokenizer.setReader(new StringReader(content));
+
+    tokenStream = tokenizer;
+
     return tokenStream;
   }
 
-  private TokenStream createNGramTokenStream(String content, int ngram) {
-    tokenStream = new StandardTokenizer(new StringReader(content));
-    tokenStream = new LowerCaseFilter(tokenStream);
+  private TokenStream createNGramTokenStream(String content, int mingram, int maxgram) {
+    Tokenizer tokenizer = new StandardTokenizer();
+    tokenizer.setReader(new StringReader(content));
+    tokenStream = new LowerCaseFilter(tokenizer);
     tokenStream = applyStemmer(stemFilterType);
-    ShingleFilter shingleFilter = new ShingleFilter(tokenStream, ngram, ngram);
+    ShingleFilter shingleFilter = new ShingleFilter(tokenStream, mingram, maxgram);
     shingleFilter.setOutputUnigrams(false);
     tokenStream = (TokenStream)shingleFilter;
     return tokenStream;

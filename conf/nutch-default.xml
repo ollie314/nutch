@@ -164,7 +164,7 @@
 
 <property>
   <name>http.agent.version</name>
-  <value>Nutch-1.12-SNAPSHOT</value>
+  <value>Nutch-1.13-SNAPSHOT</value>
   <description>A version string to advertise in the User-Agent 
    header.</description>
 </property>
@@ -982,6 +982,24 @@
    fetcher.bandwidth.target. Defaults to 30 and must be at least 1.</description>
 </property>
 
+<property>
+
+  <name>fetcher.store.robotstxt</name>
+  <value>false</value>
+  <description>If true (and fetcher.store.content is also true),
+  fetcher will store the robots.txt response content and status for
+  debugging or archival purposes. The robots.txt is added to the
+  content/ folder of the fetched segment.
+  </description>
+</property>
+
+<property>
+	<name>fetcher.publisher</name>
+	<value>false</value>
+	<description>Set this value to true if you want to use an implementation of the Publisher/Subscriber model. Make sure to set corresponding
+	Publisher implementation specific properties</description>
+</property> 
+
 <!-- moreindexingfilter plugin properties -->
 
 <property>
@@ -1444,8 +1462,10 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
 
  <property>
   <name>scoring.similarity.ngrams</name>
-  <value>1</value>
-  <description>Specifies the 'n' in ngrams</description>
+  <value>1,1</value>
+  <description>Specifies the min 'n' and max 'n' in ngrams as comma-separated.
+    If one value is specified as 'n', it will be used for both the min 'n' and max 'n' in ngrams.
+  </description>
 </property>
 
 <property>
@@ -1810,8 +1830,8 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
 <property>
   <name>elastic.host</name>
   <value></value>
-  <description>The hostname to send documents to using TransportClient. Either host
-  and port must be defined or cluster.</description>
+  <description>Comma-separated list of hostnames to send documents to using
+  TransportClient. Either host and port must be defined or cluster.</description>
 </property>
 
 <property> 
@@ -1843,6 +1863,27 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
   <name>elastic.max.bulk.size</name>
   <value>2500500</value> 
   <description>Maximum size of the bulk in bytes.</description>
+</property>
+
+<property>
+  <name>elastic.exponential.backoff.millis</name>
+  <value>100</value>
+  <description>Initial delay for the BulkProcessor's exponential backoff policy.
+  </description>
+</property>
+
+<property>
+  <name>elastic.exponential.backoff.retries</name>
+  <value>10</value>
+  <description>Number of times the BulkProcessor's exponential backoff policy
+  should retry bulk operations.</description>
+</property>
+
+<property>
+  <name>elastic.bulk.close.timeout</name>
+  <value>600</value>
+  <description>Number of seconds allowed for the BulkProcessor to complete its
+  last operation.</description>
 </property>
 
 <!-- subcollection properties -->
@@ -1953,7 +1994,7 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
   <description>
     A String value representing the flavour of Selenium 
     WebDriver() to use. Currently the following options
-    exist - 'firefox', 'chrome', 'safari', 'opera' and 'remote'.
+    exist - 'firefox', 'chrome', 'safari', 'opera', 'phantomjs' and 'remote'.
     If 'remote' is used it is essential to also set correct properties for
     'selenium.hub.port', 'selenium.hub.path', 'selenium.hub.host',
     'selenium.hub.protocol', 'selenium.grid.driver' and 'selenium.grid.binary'.
@@ -1989,7 +2030,7 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
   <value>firefox</value>
   <description>A String value representing the flavour of Selenium 
     WebDriver() used on the selenium grid. Currently the following options
-    exist - 'firefox' </description>
+    exist - 'firefox', 'phantomjs' </description>
 </property>
 
 <property>
@@ -2219,5 +2260,54 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     field aggregations. Host metadata will contain fields for each percentile.
   </description>
 </property>
+
+<!-- publisher properties 
+      Do not forget to add the name of your publisher implementation 
+      in plugin.includes ex- publish-rabbitmq -->
+<property>
+  <name>publisher.queue.type</name>
+  <value></value>
+  <description>
+    Choose the type of Queue being used (ex - RabbitMQ, ActiveMq, Kafka, etc). 
+    Currently there exists an implemtation for RabbitMQ producer. 
+  </description>
+</property>
+<property>
+  <name>publisher.order</name>
+  <value></value>
+  <description>
+    The order in which the publisher queues would be loaded
+  </description>
+</property>
+<!-- RabbitMQ properties -->
+<property>
+  <name>rabbitmq.exchange.server</name>
+  <value></value>
+  <description>
+    Name for the exchange server to use. Default - "fetcher_log"
+  </description>
+</property>
+<property>
+  <name>rabbitmq.exchange.type</name>
+  <value></value>
+  <description>
+    There are a few exchange types available: direct, topic, headers and fanout. Default "fanout".
+  </description>
+</property>
+<property>
+  <name>rabbitmq.host</name>
+  <value></value>
+  <description>
+    Host on which the RabbitMQ server is running. Default "localhost".
+  </description>
+</property>
+<property>
+  <name>rabbitmq.queue.routingkey</name>
+  <value></value>
+  <description>
+    The routingKey used by publisher to publish messages to specific queues. If the exchange type is "fanout", then this property is ignored. 
+  </description>
+</property>
+
 
 </configuration>
